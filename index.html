@@ -10,796 +10,848 @@
 <title>Weizel Wash App</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-:root {
-  --bg: #F0F2F0; --surface: #FFF; --ink: #1A1D1A; --ink-soft: #5A6359;
-  --accent: #2D6A4F; --accent-light: #D8EDE4;
-  --warn: #C45C2A; --warn-light: #FDEEE6;
-  --red: #B91C1C; --red-light: #FEE2E2;
-  --blue: #1D4ED8; --blue-light: #DBEAFE;
-  --border: #DDE3DC; --radius: 16px; --radius-sm: 10px;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#F0F2F0;--surface:#FFF;--ink:#1A1D1A;--ink-soft:#5A6359;
+  --accent:#2D6A4F;--accent-light:#D8EDE4;
+  --warn:#C45C2A;--warn-light:#FDEEE6;
+  --red:#B91C1C;
+  --border:#DDE3DC;--radius:16px;--radius-sm:10px;
 }
-html { font-size: 16px; }
-body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; touch-action: manipulation; }
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;touch-action:manipulation;}
+header{background:var(--accent);color:white;padding:18px 20px 14px;position:sticky;top:0;z-index:100;}
+header h1{font-size:17px;font-weight:700;}
+.header-sub{font-size:11px;opacity:0.7;margin-top:2px;font-family:'DM Mono',monospace;}
+.pips{display:flex;gap:6px;margin-top:10px;}
+.pip{flex:1;height:3px;border-radius:99px;background:rgba(255,255,255,0.25);transition:background 0.3s;}
+.pip.on{background:white;}
+.wrap{max-width:480px;margin:0 auto;padding:20px 16px 40px;}
+.screen{display:none;}.screen.on{display:block;}
+.card{background:var(--surface);border-radius:var(--radius);padding:18px;margin-bottom:12px;border:1px solid var(--border);}
+.card-title{font-size:19px;font-weight:700;color:var(--ink);margin-bottom:16px;line-height:1.3;}
 
-header { background: var(--accent); color: white; padding: 18px 20px 14px; position: sticky; top: 0; z-index: 100; }
-header h1 { font-size: 17px; font-weight: 700; }
-.header-sub { font-size: 11px; opacity: 0.7; margin-top: 2px; font-family: 'DM Mono', monospace; }
-.phase-indicator { display: flex; gap: 6px; margin-top: 10px; }
-.phase-pip { flex: 1; height: 3px; border-radius: 99px; background: rgba(255,255,255,0.25); transition: background 0.3s; }
-.phase-pip.active { background: white; }
-
-.container { max-width: 480px; margin: 0 auto; padding: 20px 16px 40px; }
-.screen { display: none; }
-.screen.active { display: block; }
-
-.card { background: var(--surface); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; border: 1px solid var(--border); }
-.card-label { font-size: 19px; font-weight: 700; color: var(--ink); margin-bottom: 16px; line-height: 1.3; }
+/* Active banner */
+.abanner{background:var(--ink);color:white;border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;display:none;}
+.abanner h3{font-size:14px;font-weight:700;margin-bottom:4px;}
+.abanner p{font-size:12px;opacity:0.75;line-height:1.5;}
+.abanner-btn{background:var(--accent);border:none;color:white;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;margin-top:12px;width:100%;font-family:'DM Sans',sans-serif;}
 
 /* Type grid */
-.type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.type-btn { background: var(--bg); border: 2px solid var(--border); border-radius: var(--radius-sm); padding: 14px 10px; text-align: center; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: all 0.15s; }
-.type-btn.selected { background: var(--accent-light); border-color: var(--accent); }
-.type-btn .icon { font-size: 26px; }
-.type-btn .label { font-size: 13px; font-weight: 600; color: var(--ink); }
-.type-btn .sublabel { font-size: 11px; color: var(--ink-soft); line-height: 1.3; }
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.tbtn{background:var(--bg);border:2px solid var(--border);border-radius:var(--radius-sm);padding:14px 10px;text-align:center;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;flex-direction:column;align-items:center;gap:5px;transition:all 0.15s;}
+.tbtn.on{background:var(--accent-light);border-color:var(--accent);}
+.tbtn .ico{font-size:26px;}
+.tbtn .lbl{font-size:13px;font-weight:600;color:var(--ink);}
+.tbtn .sub{font-size:11px;color:var(--ink-soft);line-height:1.3;}
 
 /* Content items */
-.content-grid { display: flex; flex-direction: column; gap: 8px; }
-.content-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--bg); border-radius: var(--radius-sm); border: 2px solid var(--border); cursor: pointer; transition: all 0.15s; }
-.content-item.selected { background: var(--accent-light); border-color: var(--accent); }
-.ci-icon { font-size: 20px; }
-.ci-text { flex: 1; }
-.ci-label { font-size: 13px; font-weight: 600; }
-.ci-sub { font-size: 11px; color: var(--ink-soft); margin-top: 2px; }
-.ci-tag { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
-.ci-tag.trockner { background: var(--blue-light); color: var(--blue); }
-.ci-tag.luft { background: var(--accent-light); color: var(--accent); }
+.cgrid{display:flex;flex-direction:column;gap:8px;}
+.citem{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg);border-radius:var(--radius-sm);border:2px solid var(--border);cursor:pointer;transition:all 0.15s;}
+.citem.on{background:var(--accent-light);border-color:var(--accent);}
+.cico{font-size:20px;}.ctxt{flex:1;}
+.clbl{font-size:13px;font-weight:600;}
+.csub{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+.ctag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;}
+.ctag.t{background:#DBEAFE;color:#1D4ED8;}
+.ctag.l{background:var(--accent-light);color:var(--accent);}
 
 /* Steps */
-.phase-title { font-size: 13px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; font-family: 'DM Mono', monospace; }
-.step { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 12px; cursor: pointer; transition: all 0.2s; }
-.step.done { opacity: 0.45; background: var(--bg); }
-.step-check { width: 26px; height: 26px; min-width: 26px; border-radius: 50%; border: 2px solid var(--border); background: white; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all 0.2s; margin-top: 2px; }
-.step.done .step-check { background: var(--accent); border-color: var(--accent); color: white; }
-.step-content { flex: 1; }
-.step-icon { font-size: 18px; margin-bottom: 3px; display: block; }
-.step-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-.step-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
-.step-hl { background: var(--accent-light); border-radius: 6px; padding: 8px 10px; margin-top: 8px; font-size: 13px; font-weight: 500; color: var(--accent); font-family: 'DM Mono', monospace; line-height: 1.6; }
-.step-warn { background: var(--warn-light); border-radius: 6px; padding: 8px 10px; margin-top: 8px; font-size: 12px; color: var(--warn); line-height: 1.4; }
-.step-crit { background: var(--red); border-radius: 8px; padding: 10px 12px; margin-top: 8px; font-size: 13px; font-weight: 600; color: white; line-height: 1.4; display: flex; align-items: flex-start; gap: 8px; }
+.ptitle{font-size:13px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;font-family:'DM Mono',monospace;}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:all 0.2s;}
+.step.done{opacity:0.45;background:var(--bg);}
+.chk{width:26px;height:26px;min-width:26px;border-radius:50%;border:2px solid var(--border);background:white;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all 0.2s;margin-top:2px;}
+.step.done .chk{background:var(--accent);border-color:var(--accent);color:white;}
+.scnt{flex:1;}
+.sico{font-size:18px;margin-bottom:3px;display:block;}
+.stitle{font-size:14px;font-weight:600;margin-bottom:4px;}
+.sdesc{font-size:13px;color:var(--ink-soft);line-height:1.5;}
+.shl{background:var(--accent-light);border-radius:6px;padding:8px 10px;margin-top:8px;font-size:13px;font-weight:500;color:var(--accent);font-family:'DM Mono',monospace;line-height:1.6;}
+.swarn{background:var(--warn-light);border-radius:6px;padding:8px 10px;margin-top:8px;font-size:12px;color:var(--warn);line-height:1.4;}
+.scrit{background:var(--red);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:13px;font-weight:600;color:white;line-height:1.4;display:flex;align-items:flex-start;gap:8px;}
 
 /* Fill */
-.fill-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.fill-btn { background: var(--bg); border: 2px solid var(--border); border-radius: var(--radius-sm); padding: 12px 4px; text-align: center; cursor: pointer; transition: all 0.15s; }
-.fill-btn.selected { background: var(--accent-light); border-color: var(--accent); }
-.fill-bar { width: 28px; height: 36px; margin: 0 auto 6px; background: var(--border); border-radius: 4px; overflow: hidden; position: relative; }
-.fill-bar-inner { position: absolute; bottom: 0; left: 0; right: 0; background: var(--accent); }
-.fill-btn .label { font-size: 11px; font-weight: 500; color: var(--ink-soft); }
+.fgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.fbtn{background:var(--bg);border:2px solid var(--border);border-radius:var(--radius-sm);padding:12px 4px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.fbtn.on{background:var(--accent-light);border-color:var(--accent);}
+.fbar{width:28px;height:36px;margin:0 auto 6px;background:var(--border);border-radius:4px;overflow:hidden;position:relative;}
+.fbar-in{position:absolute;bottom:0;left:0;right:0;background:var(--accent);}
+.fbtn .fl{font-size:11px;font-weight:500;color:var(--ink-soft);}
 
-/* Zeit-Szenario Buttons */
-.scenario-grid { display: flex; flex-direction: column; gap: 10px; }
-.scenario-btn { border: 2px solid var(--border); border-radius: var(--radius-sm); padding: 16px; cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: left; background: var(--bg); transition: all 0.15s; display: flex; align-items: center; gap: 14px; }
-.scenario-btn.selected { border-color: var(--accent); background: var(--accent-light); }
-.scenario-btn .s-icon { font-size: 28px; flex-shrink: 0; }
-.scenario-btn .s-text .s-title { font-size: 15px; font-weight: 700; color: var(--ink); }
-.scenario-btn .s-text .s-sub { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+/* Dialog */
+.dbtn{border:2px solid var(--border);border-radius:var(--radius-sm);padding:14px;cursor:pointer;font-family:'DM Sans',sans-serif;text-align:left;background:var(--bg);transition:all 0.15s;display:flex;align-items:center;gap:12px;width:100%;margin-bottom:8px;}
+.dbtn:last-child{margin-bottom:0;}
+.dico{font-size:24px;flex-shrink:0;}
+.dtitle{font-size:14px;font-weight:700;color:var(--ink);}
+.dsub{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+.hint{border-radius:var(--radius-sm);padding:12px 14px;margin-top:10px;font-size:13px;line-height:1.5;display:none;}
+.hint.on{display:block;}
+.hint.g{background:var(--accent-light);color:var(--accent);}
+.hint.w{background:var(--warn-light);color:var(--warn);}
+.back-link{background:none;border:none;color:var(--ink-soft);font-size:13px;cursor:pointer;padding:10px 0 0 0;font-family:'DM Sans',sans-serif;display:none;}
+.back-link.on{display:block;}
 
-/* Unterwegs Fragen */
-.unterwegs-flow { margin-top: 12px; display: none; }
-.unterwegs-flow.visible { display: block; }
-.flow-question { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
-.flow-hint { background: var(--warn-light); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 13px; color: var(--warn); margin-top: 10px; display: none; }
-.flow-hint.visible { display: block; }
-
-/* Drum picker */
-.time-input-row { display: flex; align-items: center; gap: 10px; }
-.drum-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.drum-btn { background: var(--accent-light); border: none; border-radius: 8px; width: 100%; padding: 10px 0; font-size: 20px; color: var(--accent); cursor: pointer; font-weight: 700; line-height: 1; }
-.drum-btn:active { background: var(--accent); color: white; }
-.drum-display { background: var(--ink); color: white; border-radius: var(--radius-sm); width: 100%; padding: 14px 0; font-size: 32px; font-family: 'DM Mono', monospace; font-weight: 500; text-align: center; letter-spacing: 2px; }
-.time-sep { font-size: 32px; font-weight: 700; color: var(--ink-soft); padding-top: 40px; }
-.zeit-empf { border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 10px; display: none; }
-.zeit-empf.gut { background: var(--accent-light); color: var(--accent); }
-.zeit-empf.warn { background: var(--warn-light); color: var(--warn); }
-.zeit-empf strong { display: block; font-size: 14px; margin-bottom: 3px; }
-.zeit-empf span { font-size: 12px; line-height: 1.5; }
-
-/* Zeitvorwahl */
-.zv-card { background: #1A1D1A; color: white; border-radius: var(--radius); padding: 16px 18px; margin-bottom: 12px; }
-.zv-card h3 { font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'DM Mono', monospace; margin-bottom: 6px; }
-.zv-hl { font-family: 'DM Mono', monospace; font-size: 16px; color: #7EC8A0; display: block; margin-bottom: 5px; }
-.zv-card p { font-size: 13px; opacity: 0.85; line-height: 1.5; }
+/* Drum */
+.trow{display:flex;align-items:center;gap:10px;margin-top:12px;}
+.dwrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.darr{background:var(--accent-light);border:none;border-radius:8px;width:100%;padding:10px 0;font-size:20px;color:var(--accent);cursor:pointer;font-weight:700;line-height:1;}
+.darr:active{background:var(--accent);color:white;}
+.ddisp{background:var(--ink);color:white;border-radius:var(--radius-sm);width:100%;padding:14px 0;font-size:32px;font-family:'DM Mono',monospace;font-weight:500;text-align:center;letter-spacing:2px;}
+.dsep{font-size:32px;font-weight:700;color:var(--ink-soft);padding-top:40px;}
 
 /* Anleitung header */
-.anl-header { background: var(--accent); color: white; border-radius: var(--radius); padding: 18px 20px; margin-bottom: 12px; }
-.anl-header h2 { font-size: 17px; font-weight: 700; }
-.anl-header p { font-size: 12px; opacity: 0.8; margin-top: 6px; line-height: 1.6; }
-.progress-outer { background: rgba(255,255,255,0.25); border-radius: 99px; height: 3px; margin: 10px 0 0; }
-.progress-inner { height: 100%; background: white; border-radius: 99px; transition: width 0.3s; }
+.anlhd{background:var(--accent);color:white;border-radius:var(--radius);padding:18px 20px;margin-bottom:12px;}
+.anlhd h2{font-size:17px;font-weight:700;}
+.anlhd p{font-size:12px;opacity:0.8;margin-top:6px;line-height:1.6;}
+.progbar{background:rgba(255,255,255,0.25);border-radius:99px;height:3px;margin:10px 0 0;}
+.progbar-in{height:100%;background:white;border-radius:99px;transition:width 0.3s;}
 
-/* Timer */
-.timer-card { background: var(--ink); color: white; border-radius: var(--radius); padding: 20px; margin-bottom: 12px; text-align: center; }
-.timer-lbl { font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.6px; }
-.timer-display { font-family: 'DM Mono', monospace; font-size: 48px; font-weight: 500; letter-spacing: -2px; margin: 12px 0; line-height: 1; }
-.timer-controls { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
-.timer-btn { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 14px 20px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; width: 100%; }
-.timer-btn.secondary { background: rgba(255,255,255,0.12); font-weight: 500; }
+/* ZV card */
+.zvc{background:#1A1D1A;color:white;border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;}
+.zvc h3{font-size:11px;opacity:0.6;text-transform:uppercase;letter-spacing:0.5px;font-family:'DM Mono',monospace;margin-bottom:6px;}
+.zvhl{font-family:'DM Mono',monospace;font-size:16px;color:#7EC8A0;display:block;margin-bottom:5px;}
+.zvc p{font-size:13px;opacity:0.85;line-height:1.5;}
+
+/* Siri */
+.siric{background:#FEF9C3;border:1px solid #FDE68A;border-radius:var(--radius);padding:18px;margin-bottom:12px;}
+.siritxt{background:white;border:2px solid #FDE68A;border-radius:10px;padding:14px;font-size:15px;font-weight:600;color:var(--ink);line-height:1.5;cursor:pointer;text-align:center;margin:10px 0 6px;}
+
+/* Fertig banner */
+.fertbanner{background:var(--accent);color:white;border-radius:var(--radius);padding:22px 20px;margin-bottom:12px;text-align:center;}
+.fertbanner h2{font-size:22px;font-weight:700;margin-bottom:6px;}
+.fertbanner p{font-size:13px;opacity:0.85;line-height:1.5;}
 
 /* Buttons */
-.btn { width: 100%; background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); padding: 16px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.15s; margin-top: 8px; }
-.btn:disabled { opacity: 0.32; cursor: not-allowed; }
-.btn-secondary { background: var(--surface); color: var(--accent); border: 2px solid var(--accent); }
-.btn-go { background: #F59E0B; color: #1A1D1A; margin-top: 20px; font-size: 17px; padding: 20px; border-radius: var(--radius); box-shadow: 0 4px 16px rgba(245,158,11,0.4); font-weight: 700; }
-.btn-go:disabled { opacity: 0.32; cursor: not-allowed; box-shadow: none; }
-
-.hint-card { border-radius: var(--radius); padding: 16px 18px; margin-bottom: 12px; }
-.hint-card.yellow { background: #FEF9C3; border: 1px solid #FDE68A; }
+.btn{width:100%;background:var(--accent);color:white;border:none;border-radius:var(--radius-sm);padding:16px;font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.15s;margin-top:8px;}
+.btn:disabled{opacity:0.32;cursor:not-allowed;}
+.btn-sec{background:var(--surface);color:var(--accent);border:2px solid var(--accent);}
+.btn-go{background:#F59E0B;color:#1A1D1A;margin-top:20px;font-size:17px;padding:20px;border-radius:var(--radius);box-shadow:0 4px 16px rgba(245,158,11,0.4);font-weight:700;}
+.btn-go:disabled{opacity:0.32;cursor:not-allowed;box-shadow:none;}
+.btn-big{background:var(--accent);color:white;border:none;border-radius:var(--radius);padding:20px;font-size:17px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;margin-top:8px;}
 </style>
 </head>
 <body>
 <header>
   <h1>🧺 Weizel Wash App</h1>
   <p class="header-sub">Bosch Logixx 7 · Wildtalstraße 66</p>
-  <div class="phase-indicator">
-    <div class="phase-pip" id="pip-1"></div>
-    <div class="phase-pip" id="pip-2"></div>
+  <div class="pips">
+    <div class="pip" id="p1"></div>
+    <div class="pip" id="p2"></div>
+    <div class="pip" id="p3"></div>
+    <div class="pip" id="p4"></div>
   </div>
 </header>
-<div class="container">
+<div class="wrap">
 
-  <!-- PHASE 1 -->
-  <div class="screen active" id="screen-phase1">
-    <div class="card">
-      <div class="card-label">Welche Wäsche liegt vor dir?</div>
-      <div class="type-grid">
-        <button class="type-btn" data-type="schwarz" onclick="selectType(this)">
-          <span class="icon">🖤</span><span class="label">Schwarz & Dunkel</span><span class="sublabel">Dunkle Kleidung</span>
-        </button>
-        <button class="type-btn" data-type="bunt" onclick="selectType(this)">
-          <span class="icon">🌈</span><span class="label">Bunte Wäsche</span><span class="sublabel">Farbige Kleidung</span>
-        </button>
-        <button class="type-btn" data-type="weiss" onclick="selectType(this)">
-          <span class="icon">🤍</span><span class="label">Weiß & Hell</span><span class="sublabel">Weiße & helle Sachen</span>
-        </button>
-        <button class="type-btn" data-type="sport" onclick="selectType(this)">
-          <span class="icon">👟</span><span class="label">Sport</span><span class="sublabel">Funktionskleidung</span>
-        </button>
-        <button class="type-btn" data-type="handtuecher" onclick="selectType(this)">
-          <span class="icon">🛁</span><span class="label">Handtücher</span><span class="sublabel">Bad & Küche</span>
-        </button>
-        <button class="type-btn" data-type="bettwaesche" onclick="selectType(this)">
-          <span class="icon">🛏️</span><span class="label">Bettwäsche</span><span class="sublabel">Bezüge & Laken</span>
-        </button>
-      </div>
-    </div>
+<!-- S1: SORTIEREN -->
+<div class="screen on" id="s1">
+  <div class="abanner" id="abanner">
+    <h3 id="ab-h"></h3>
+    <p id="ab-p"></p>
+    <button class="abanner-btn" onclick="abDone()">🧺 Wäsche ist fertig – jetzt rausnehmen!</button>
+  </div>
 
-    <div class="card" id="card-content" style="display:none">
-      <div class="card-label">Was ist dabei?</div>
-      <div class="content-grid" id="content-grid"></div>
-    </div>
-
-    <div id="sort-steps" style="display:none">
-      <div class="phase-title">📋 Jetzt oben erledigen</div>
-      <div id="sort-steps-list"></div>
-      <button class="btn btn-go" id="btn-runter" onclick="goPhase2()" disabled>👇 Weiter – ich gehe jetzt zur Maschine</button>
-      <div id="sort-hint" style="text-align:center;font-size:12px;color:var(--ink-soft);margin-top:8px;">Bitte alle Schritte oben abhaken</div>
+  <div class="card">
+    <div class="card-title">Welche Wäsche liegt vor dir?</div>
+    <div class="tgrid">
+      <button class="tbtn" data-t="schwarz" onclick="pickType(this)"><span class="ico">🖤</span><span class="lbl">Schwarz & Dunkel</span><span class="sub">Dunkle Kleidung</span></button>
+      <button class="tbtn" data-t="bunt" onclick="pickType(this)"><span class="ico">🌈</span><span class="lbl">Bunte Wäsche</span><span class="sub">Farbige Kleidung</span></button>
+      <button class="tbtn" data-t="weiss" onclick="pickType(this)"><span class="ico">🤍</span><span class="lbl">Weiß & Hell</span><span class="sub">Weiße & helle Sachen</span></button>
+      <button class="tbtn" data-t="sport" onclick="pickType(this)"><span class="ico">👟</span><span class="lbl">Sport</span><span class="sub">Funktionskleidung</span></button>
+      <button class="tbtn" data-t="handtuecher" onclick="pickType(this)"><span class="ico">🛁</span><span class="lbl">Handtücher</span><span class="sub">Bad & Küche</span></button>
+      <button class="tbtn" data-t="bettwaesche" onclick="pickType(this)"><span class="ico">🛏️</span><span class="lbl">Bettwäsche</span><span class="sub">Bezüge & Laken</span></button>
     </div>
   </div>
 
-  <!-- PHASE 2 -->
-  <div class="screen" id="screen-phase2">
-    <div class="hint-card yellow">
-      <div style="font-size:22px;margin-bottom:8px;">👇</div>
-      <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:6px;">Wäsche jetzt in die Trommel legen</div>
-      <div style="font-size:13px;color:var(--ink-soft);line-height:1.5;">Leg die Wäsche locker in die Maschine – dann siehst du direkt wie voll sie ist.</div>
-    </div>
-
-    <div class="card">
-      <div class="card-label">Wie voll ist die Maschine?</div>
-      <div class="fill-grid">
-        <button class="fill-btn" data-fill="0.25" onclick="selectFill(this)">
-          <div class="fill-bar"><div class="fill-bar-inner" style="height:25%"></div></div>
-          <div class="label">¼ voll</div>
-        </button>
-        <button class="fill-btn" data-fill="0.5" onclick="selectFill(this)">
-          <div class="fill-bar"><div class="fill-bar-inner" style="height:50%"></div></div>
-          <div class="label">½ voll</div>
-        </button>
-        <button class="fill-btn" data-fill="0.75" onclick="selectFill(this)">
-          <div class="fill-bar"><div class="fill-bar-inner" style="height:75%"></div></div>
-          <div class="label">¾ voll</div>
-        </button>
-        <button class="fill-btn" data-fill="1.0" onclick="selectFill(this)">
-          <div class="fill-bar"><div class="fill-bar-inner" style="height:100%"></div></div>
-          <div class="label">Voll</div>
-        </button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-label">Wie ist deine Situation?</div>
-      <div class="scenario-grid">
-        <button class="scenario-btn" data-scenario="flexibel" onclick="selectScenario(this)">
-          <span class="s-icon">🟢</span>
-          <div class="s-text">
-            <div class="s-title">Ich bin flexibel</div>
-            <div class="s-sub">Ich bin zu Hause und hab Zeit</div>
-          </div>
-        </button>
-        <button class="scenario-btn" data-scenario="unterwegs" onclick="selectScenario(this)">
-          <span class="s-icon">🚗</span>
-          <div class="s-text">
-            <div class="s-title">Ich bin heute unterwegs</div>
-            <div class="s-sub">Wäsche soll per Zeitvorwahl fertig sein</div>
-          </div>
-        </button>
-        <button class="scenario-btn" data-scenario="dringend" onclick="selectScenario(this)">
-          <span class="s-icon">⚡</span>
-          <div class="s-text">
-            <div class="s-title">Dringende Wäsche</div>
-            <div class="s-sub">Ich muss bald los und brauche die Wäsche</div>
-          </div>
-        </button>
-      </div>
-
-      <!-- Unterwegs Flow -->
-      <div class="unterwegs-flow" id="unterwegs-flow">
-        <div style="height:1px;background:var(--border);margin:16px 0;"></div>
-        <div class="flow-question" id="flow-question"></div>
-        <div class="time-input-row">
-          <div class="drum-wrap">
-            <button class="drum-btn" onclick="changeHour(-1)">▲</button>
-            <div class="drum-display" id="display-h">HH</div>
-            <button class="drum-btn" onclick="changeHour(1)">▼</button>
-          </div>
-          <span class="time-sep">:</span>
-          <div class="drum-wrap">
-            <button class="drum-btn" onclick="changeMinute(-1)">▲</button>
-            <div class="drum-display" id="display-m">MM</div>
-            <button class="drum-btn" onclick="changeMinute(1)">▼</button>
-          </div>
-        </div>
-        <div class="flow-hint" id="flow-hint"></div>
-      </div>
-    </div>
-
-    <button class="btn" id="btn-anleitung" disabled onclick="showAnleitung()">Anleitung anzeigen →</button>
-    <button class="btn btn-secondary" onclick="backToPhase1()" style="margin-top:8px;">← Zurück</button>
+  <div class="card" id="c-content" style="display:none">
+    <div class="card-title">Was ist dabei?</div>
+    <div class="cgrid" id="content-grid"></div>
   </div>
 
-  <!-- ANLEITUNG -->
-  <div class="screen" id="screen-anleitung">
-    <div class="anl-header">
-      <h2 id="anl-titel"></h2>
-      <p id="anl-sub"></p>
-      <div class="progress-outer"><div class="progress-inner" id="progress-bar" style="width:0%"></div></div>
-    </div>
-
-    <div class="zv-card" id="zv-card" style="display:none">
-      <h3>Zeitvorwahl-Empfehlung</h3>
-      <span class="zv-hl" id="zv-hl"></span>
-      <p id="zv-text"></p>
-    </div>
-
-    <div id="maschinen-steps"></div>
-
-    <div class="timer-card">
-      <div class="timer-lbl">⏱ Wäsche-Timer</div>
-      <div class="timer-display" id="timer-display">--:--</div>
-      <div class="timer-controls">
-        <button class="timer-btn" id="timer-uhr-btn" onclick="openUhrApp()">⏰ In iPhone Uhr öffnen – „Wäsche aufhängen"</button>
-        <button class="timer-btn secondary" id="timer-reset-btn" onclick="resetTimerDisplay()" style="display:none">Zurücksetzen</button>
-      </div>
-    </div>
-
-    <button class="btn btn-secondary" onclick="backToPhase2()">← Zurück</button>
-    <button class="btn btn-secondary" onclick="startOver()" style="margin-top:8px;">↺ Neue Wäsche</button>
+  <div id="sort-area" style="display:none">
+    <div class="ptitle">📋 Jetzt oben erledigen</div>
+    <div id="sort-list"></div>
+    <button class="btn btn-go" id="btn-down" onclick="goS2()" disabled>👇 Weiter – ich gehe jetzt zur Maschine</button>
+    <div id="sort-hint" style="text-align:center;font-size:12px;color:var(--ink-soft);margin-top:8px;">Bitte alle Schritte oben abhaken</div>
   </div>
-
 </div>
+
+<!-- S2: MASCHINE -->
+<div class="screen" id="s2">
+  <div style="background:#FEF9C3;border:1px solid #FDE68A;border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;">
+    <div style="font-size:22px;margin-bottom:8px;">👇</div>
+    <div style="font-size:15px;font-weight:700;margin-bottom:6px;">Wäsche jetzt in die Trommel legen</div>
+    <div style="font-size:13px;color:var(--ink-soft);line-height:1.5;">Leg die Wäsche locker rein – dann siehst du wie voll sie ist.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Wie voll ist die Maschine?</div>
+    <div class="fgrid">
+      <button class="fbtn" data-f="0.25" onclick="pickFill(this)"><div class="fbar"><div class="fbar-in" style="height:25%"></div></div><div class="fl">¼ voll</div></button>
+      <button class="fbtn" data-f="0.5" onclick="pickFill(this)"><div class="fbar"><div class="fbar-in" style="height:50%"></div></div><div class="fl">½ voll</div></button>
+      <button class="fbtn" data-f="0.75" onclick="pickFill(this)"><div class="fbar"><div class="fbar-in" style="height:75%"></div></div><div class="fl">¾ voll</div></button>
+      <button class="fbtn" data-f="1.0" onclick="pickFill(this)"><div class="fbar"><div class="fbar-in" style="height:100%"></div></div><div class="fl">Voll</div></button>
+    </div>
+  </div>
+
+  <div class="card" id="dialog-card" style="display:none">
+    <div class="card-title" id="d-q"></div>
+    <div id="d-prog" style="display:none;margin-bottom:14px;"><div class="shl" id="d-prog-txt"></div></div>
+    <div id="d-btns"></div>
+    <div id="d-rueck" style="display:none;margin-top:4px;">
+      <button class="back-link on" onclick="dialogBack()">← Zurück</button>
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px;margin-top:8px;">Wann bist du zurück?</div>
+      <div class="trow">
+        <div class="dwrap">
+          <button class="darr" onclick="dH(-1)">▲</button>
+          <div class="ddisp" id="dH">HH</div>
+          <button class="darr" onclick="dH(1)">▼</button>
+        </div>
+        <span class="dsep">:</span>
+        <div class="dwrap">
+          <button class="darr" onclick="dM(-1)">▲</button>
+          <div class="ddisp" id="dM">MM</div>
+          <button class="darr" onclick="dM(1)">▼</button>
+        </div>
+      </div>
+      <div class="hint" id="rueck-hint"></div>
+    </div>
+    <button class="back-link" id="d-back-confirmed" onclick="dialogBack()">← Zurück zur Programmauswahl</button>
+  </div>
+
+  <button class="btn" id="btn-anl" disabled onclick="goS3()">Anleitung anzeigen →</button>
+  <button class="btn btn-sec" onclick="goS1Back()" style="margin-top:8px;">← Zurück</button>
+</div>
+
+<!-- S3: ANLEITUNG -->
+<div class="screen" id="s3">
+  <div class="anlhd">
+    <h2 id="anl-h"></h2>
+    <p id="anl-p"></p>
+    <div class="progbar"><div class="progbar-in" id="anl-prog" style="width:0%"></div></div>
+  </div>
+
+  <div class="zvc" id="zvc" style="display:none">
+    <h3>Zeitvorwahl-Empfehlung</h3>
+    <span class="zvhl" id="zv-hl"></span>
+    <p id="zv-p"></p>
+  </div>
+
+  <div id="mach-steps"></div>
+
+  <button class="btn-big" onclick="maschineLaeuft()">▶️ Maschine ist gestartet</button>
+  <button class="btn btn-sec" onclick="goS2Back()" style="margin-top:8px;">← Zurück</button>
+</div>
+
+<!-- S4: LÄUFT -->
+<div class="screen" id="s4">
+  <div class="anlhd">
+    <h2 id="s4-h"></h2>
+    <p id="s4-p"></p>
+    <div class="progbar"><div class="progbar-in" style="width:66%"></div></div>
+  </div>
+
+  <div class="siric">
+    <div style="font-size:14px;font-weight:700;color:var(--ink);">⏰ Timer stellen</div>
+    <div style="font-size:12px;color:var(--ink-soft);margin-top:4px;">Sag diesen Satz zu Siri:</div>
+    <div class="siritxt" id="siri-txt" onclick="copySiri()"></div>
+    <div id="siri-copy-hint" style="font-size:11px;color:var(--ink-soft);text-align:center;">Antippen zum Kopieren</div>
+  </div>
+
+  <div style="background:#FEF9C3;border:1px solid #FDE68A;border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;">
+    <div style="font-size:13px;color:var(--ink-soft);line-height:1.5;">Wäsche läuft – komm zurück wenn der Timer klingelt.</div>
+  </div>
+
+  <button class="btn-big" onclick="goS5()">🧺 Wäsche ist fertig – weiter</button>
+  <button class="btn btn-sec" onclick="startOver()" style="margin-top:8px;">↺ Neue Wäsche</button>
+</div>
+
+<!-- S5: FERTIG / AUFHÄNGEN -->
+<div class="screen" id="s5">
+  <div class="fertbanner">
+    <h2>🧺 Wäsche fertig!</h2>
+    <p id="s5-p"></p>
+  </div>
+
+  <div class="step" id="step-raus" onclick="toggleStep('step-raus','chk-raus')">
+    <div class="chk" id="chk-raus"></div>
+    <div class="scnt">
+      <span class="sico">👐</span>
+      <div class="stitle">Wäsche sofort rausnehmen</div>
+      <div class="sdesc">Direkt aus der Trommel nehmen und jeden Teil kurz aufschütteln.</div>
+      <div class="swarn">⚠️ Nicht liegen lassen! Jede Minute in der Trommel verstärkt die Falten.</div>
+    </div>
+  </div>
+
+  <div class="step" id="step-auf" onclick="toggleStepAuf()">
+    <div class="chk" id="chk-auf"></div>
+    <div class="scnt">
+      <span class="sico" id="auf-ico"></span>
+      <div class="stitle" id="auf-title"></div>
+      <div class="sdesc" id="auf-desc"></div>
+      <div class="shl" id="auf-hl" style="display:none;"></div>
+      <div class="scrit" id="auf-crit" style="display:none;"><span>❗</span><span id="auf-crit-txt"></span></div>
+    </div>
+  </div>
+
+  <button class="btn btn-sec" onclick="startOver()" style="margin-top:8px;">↺ Neue Wäsche</button>
+</div>
+
+</div><!-- /wrap -->
+
 <script>
-var selectedType = null, selectedFill = null, selectedContent = {}, selectedScenario = null;
-var drumH = null, drumM = null, zeitMinuten = null;
-var sortStepsChecked = [], machStepsChecked = [];
-var currentProgMin = 60;
+// ── State ──────────────────────────────────────────────────────
+var T=null, F=null, C={}, scenario=null;
+var dh=null, dm=null, zMin=null;
+var sortChk=[], machChk=[];
+var progOrder=[], progIdx=0, dlgState=null;
+var curMin=0, curName='', curTrockner=false;
 
-function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+function p2(n){return n<10?'0'+n:''+n;}
 
-var PROGRAMME = {
-  kochbunt:     { name: "Koch/Bunt",      min: 160, temp: 60, rpm: 1400 },
-  sensitiv:     { name: "Sensitiv",       min: 133, temp: 40, rpm: 1200 },
-  pflegeleicht: { name: "Pflegeleicht",   min: 103, temp: 40, rpm: 1200 },
-  daunen:       { name: "Daunen",         min: 89,  temp: 40, rpm: 1200 },
-  schnellmix:   { name: "Schnell/Mix",    min: 76,  temp: 40, rpm: 1400 },
-  blusen:       { name: "Blusen/Hemden",  min: 60,  temp: 40, rpm: 800  },
-  sportswear:   { name: "Sportswear",     min: 47,  temp: 30, rpm: 800  },
-  feinseide:    { name: "Fein/Seide",     min: 41,  temp: 30, rpm: 600  },
-  wolle:        { name: "Wolle",          min: 40,  temp: 40, rpm: 800  },
-  extrakurz:    { name: "Extra Kurz 15'", min: 15,  temp: 30, rpm: 800  }
+// ── Programme ──────────────────────────────────────────────────
+var PROG={
+  kochbunt:    {n:"Koch/Bunt",     min:160,temp:60,rpm:1400},
+  sensitiv:    {n:"Sensitiv",      min:133,temp:40,rpm:1200},
+  pflegeleicht:{n:"Pflegeleicht",  min:103,temp:40,rpm:1200},
+  daunen:      {n:"Daunen",        min:89, temp:40,rpm:1200},
+  schnellmix:  {n:"Schnell/Mix",   min:76, temp:40,rpm:1400},
+  blusen:      {n:"Blusen/Hemden", min:60, temp:40,rpm:800},
+  sportswear:  {n:"Sportswear",    min:47, temp:30,rpm:800},
+  feinseide:   {n:"Fein/Seide",   min:41, temp:30,rpm:600},
+  wolle:       {n:"Wolle",         min:40, temp:40,rpm:800},
+  extrakurz:   {n:"Extra Kurz 15'",min:15, temp:30,rpm:800}
 };
 
-var PROFILES = {
-  schwarz: {
-    titel: "Schwarz & Dunkel", icon: "🖤",
-    contentOptions: [
-      { id: "unterwaesche", label: "Unterwäsche & Socken", icon: "🧦", sub: "Kann in den Trockner", tag: "trockner" },
-      { id: "klamotten", label: "T-Shirts, Hosen, Pullover", icon: "👕", sub: "Lufttrocknen", tag: "luft" }
+// ── Profiles ───────────────────────────────────────────────────
+var PROF={
+  schwarz:{
+    lbl:"Schwarz & Dunkel",ico:"🖤",
+    opts:[
+      {id:"uw",lbl:"Unterwäsche & Socken",ico:"🧦",sub:"Kann in den Trockner",tag:"t"},
+      {id:"kl",lbl:"T-Shirts, Hosen, Pullover",ico:"👕",sub:"Lufttrocknen",tag:"l"}
     ],
-    sortSteps: function(c) {
-      var s = [];
-      s.push({ icon:"👕", title:"Alles links-raus drehen", desc:"Jedes dunkle Teil umdrehen – Innenseite nach außen.", crit:"Nicht überspringen! Wichtigster Schritt gegen Ausbleichen." });
-      if (c.klamotten) s.push({ icon:"🔍", title:"Taschen leeren & Reißverschlüsse schließen", desc:"Schützt andere Teile in der Trommel." });
-      if (c.unterwaesche && c.klamotten) s.push({ icon:"📦", title:"Viel Wäsche? Dann aufteilen", desc:"Bei viel Wäsche: Unterwäsche separat von Klamotten waschen. Bei wenig Wäsche einfach alles zusammen – Trockner oder aufhängen, beides geht.", warn:"Wenig Wäsche? Einfach alles zusammen rein." });
+    sort:function(c){
+      var s=[];
+      s.push({ico:"👕",t:"Alles links-raus drehen",d:"Jedes dunkle Teil umdrehen – Innenseite nach außen.",crit:"Nicht überspringen! Wichtigster Schritt gegen Ausbleichen."});
+      if(c.kl) s.push({ico:"🔍",t:"Taschen leeren & Reißverschlüsse schließen",d:"Schützt andere Teile in der Trommel."});
+      if(c.uw&&c.kl) s.push({ico:"📦",t:"Viel Wäsche? Dann aufteilen",d:"Bei viel Wäsche: Unterwäsche separat waschen. Bei wenig Wäsche alles zusammen.",warn:"Wenig Wäsche? Einfach alles zusammen rein – Trockner oder aufhängen, beides geht."});
       return s;
     },
-    getMittel: function() { return "Perwoll Black"; },
-    getProgramm: function(verfMin) {
-      if (!verfMin) return PROGRAMME.feinseide;
-      if (verfMin >= PROGRAMME.feinseide.min + 15) return PROGRAMME.feinseide;
-      return PROGRAMME.extrakurz;
-    },
-    machineSteps: function(prog, dos, trockner) {
-      var rpmHint = prog.rpm > 800 ? ' → bitte auf 800 runterdrehen!' : '';
+    progOrder:['feinseide','extrakurz'],
+    empRpm:800,
+    steps:function(pk,dos){
+      var pr=PROG[pk]; var rpm=800;
+      var rpmWarn=pr.rpm>rpm?" Achtung: Maschine auf "+pr.rpm+" voreingestellt → bitte auf "+rpm+" runterdrehen!":"";
       return [
-        { icon:"🔢", title:"Programm einstellen", desc:"Drehe den Regler auf Fein/Seide.", hl:"Programm: " + prog.name + " · " + prog.temp + "°C · Schleudern: 800 U/min" + (prog.rpm > 800 ? " (Maschine auf " + prog.rpm + " voreingestellt" + rpmHint + ")" : "") },
-        { icon:"🧴", title:"Waschmittel einfüllen", desc:"Perwoll Black in Fach I – das rechte Fach.", hl:"Menge: " + dos.ml + " ml · ca. " + dos.el + " Esslöffel · Fach I (rechts)" },
-        { icon:"▶️", title:"Maschine starten & Timer setzen", desc:"Starte die Maschine, dann den Timer unten in der iPhone Uhr setzen." },
-        { icon: trockner ? "🌀" : "💨", title: trockner ? "In den Trockner" : "Rausnehmen & aufhängen",
-          desc: trockner ? "Direkt nach dem Waschen in den Trockner – mittlere Stufe." : "Direkt rausnehmen, aufschütteln, an der Luft trocknen.",
-          crit: trockner ? null : "Kein Trockner! Hitze bleicht schwarze Fasern aus." }
+        {ico:"🔢",t:"Programm einstellen",d:"Drehe den Regler auf Fein/Seide.",hl:"Fein/Seide · 30°C · Schleudern: "+rpm+" U/min"+rpmWarn},
+        {ico:"🧴",t:"Waschmittel einfüllen",d:"Perwoll Black in Fach I (rechts).",hl:dos.ml+" ml · ca. "+dos.el+" Esslöffel · Fach I"},
+        {ico:"▶️",t:"Maschine starten",d:"Dann Timer per Siri stellen (nächster Schritt)."}
       ];
+    },
+    auf:function(trockner){
+      return trockner
+        ?{ico:"🌀",t:"In den Trockner",d:"Direkt nach dem Waschen in den Trockner – mittlere Stufe.",hl:"Trockner: mittlere Stufe · Sofort rausnehmen wenn fertig.",crit:null}
+        :{ico:"💨",t:"Aufhängen – nicht in den Trockner!",d:"An der Luft trocknen.",hl:null,crit:"Kein Trockner! Hitze bleicht schwarze Fasern aus."};
     }
   },
-  bunt: {
-    titel: "Bunte Wäsche", icon: "🌈",
-    contentOptions: [
-      { id: "klamotten", label: "T-Shirts, Hosen, Pullover", icon: "👕", sub: "Lufttrocknen", tag: "luft" },
-      { id: "unterwaesche", label: "Bunte Unterwäsche & Socken", icon: "🧦", sub: "Kann in den Trockner", tag: "trockner" },
-      { id: "neu", label: "Neues Teil dabei?", icon: "🆕", sub: "Zum ersten Mal waschen", tag: null }
+  bunt:{
+    lbl:"Bunte Wäsche",ico:"🌈",
+    opts:[
+      {id:"kl",lbl:"T-Shirts, Hosen, Pullover",ico:"👕",sub:"Lufttrocknen",tag:"l"},
+      {id:"uw",lbl:"Bunte Unterwäsche & Socken",ico:"🧦",sub:"Kann in den Trockner",tag:"t"},
+      {id:"neu",lbl:"Neues Teil dabei?",ico:"🆕",sub:"Zum ersten Mal waschen",tag:null}
     ],
-    sortSteps: function(c) {
-      var s = [];
-      if (c.neu) s.push({ icon:"⚠️", title:"Neues Teil separat waschen!", desc:"Neue bunte Kleidung beim ersten Mal alleine waschen.", crit:"Neue Teile bluten oft aus und können andere Wäsche einfärben!" });
-      s.push({ icon:"🔍", title:"Taschen leeren & Reißverschlüsse schließen", desc:"Alle Taschen leeren, Reißverschlüsse schließen." });
-      if (c.unterwaesche && c.klamotten) s.push({ icon:"📦", title:"Viel Wäsche? Dann aufteilen", desc:"Bei viel Wäsche: Unterwäsche separat von Klamotten waschen. Bei wenig Wäsche alles zusammen.", warn:"Wenig Wäsche? Einfach alles zusammen rein – Trockner oder aufhängen, beides geht." });
+    sort:function(c){
+      var s=[];
+      if(c.neu) s.push({ico:"⚠️",t:"Neues Teil separat waschen!",d:"Neue bunte Kleidung beim ersten Mal alleine waschen.",crit:"Neue Teile bluten oft aus und können andere Wäsche einfärben!"});
+      s.push({ico:"🔍",t:"Taschen leeren & Reißverschlüsse schließen",d:"Alle Taschen leeren, Reißverschlüsse schließen."});
+      if(c.uw&&c.kl) s.push({ico:"📦",t:"Viel Wäsche? Dann aufteilen",d:"Bei viel Wäsche: Unterwäsche separat waschen. Bei wenig alles zusammen.",warn:"Wenig Wäsche? Einfach alles zusammen rein."});
       return s;
     },
-    getMittel: function() { return "Frosch Bunt Granatapfel"; },
-    getProgramm: function(verfMin) {
-      if (!verfMin) return PROGRAMME.kochbunt;
-      if (verfMin >= PROGRAMME.kochbunt.min + 15) return PROGRAMME.kochbunt;
-      if (verfMin >= PROGRAMME.pflegeleicht.min + 15) return PROGRAMME.pflegeleicht;
-      if (verfMin >= PROGRAMME.schnellmix.min + 15) return PROGRAMME.schnellmix;
-      return PROGRAMME.extrakurz;
-    },
-    machineSteps: function(prog, dos, trockner) {
-      var rpmHint = prog.rpm > 1000 ? " → bitte auf 1000 runterdrehen!" : "";
+    progOrder:['kochbunt','pflegeleicht','schnellmix','extrakurz'],
+    empRpm:1000,
+    steps:function(pk,dos){
+      var pr=PROG[pk]; var rpm=1000;
+      var rpmWarn=pr.rpm>rpm?" Achtung: Maschine auf "+pr.rpm+" voreingestellt → bitte auf "+rpm+" runterdrehen!":"";
       return [
-        { icon:"🔢", title:"Programm einstellen", desc:"Drehe den Regler auf das empfohlene Programm.", hl:"Programm: " + prog.name + " · " + prog.temp + "°C · Schleudern: 1000 U/min" + (prog.rpm > 1000 ? " (Maschine auf " + prog.rpm + " voreingestellt" + rpmHint + ")" : "") },
-        { icon:"🧴", title:"Waschmittel einfüllen", desc:"Frosch Bunt Granatapfel in Fach I – das rechte Fach.", hl:"Menge: " + dos.ml + " ml · ca. " + dos.el + " Esslöffel · Fach I (rechts)" },
-        { icon:"▶️", title:"Maschine starten & Timer setzen", desc:"Starte die Maschine, dann den Timer unten in der iPhone Uhr setzen." },
-        { icon: trockner ? "🌀" : "💨", title: trockner ? "In den Trockner" : "Rausnehmen & aufhängen",
-          desc: trockner ? "Direkt in den Trockner – mittlere Stufe." : "Direkt rausnehmen, aufschütteln, aufhängen.",
-          crit: trockner ? null : "Nicht liegen lassen! Länger als 30 Min. in der Trommel bedeutet tiefe Falten." }
+        {ico:"🔢",t:"Programm einstellen",d:"Drehe den Regler auf "+pr.n+".",hl:pr.n+" · "+pr.temp+"°C · Schleudern: "+rpm+" U/min"+rpmWarn},
+        {ico:"🧴",t:"Waschmittel einfüllen",d:"Frosch Bunt Granatapfel in Fach I (rechts).",hl:dos.ml+" ml · ca. "+dos.el+" Esslöffel · Fach I"},
+        {ico:"▶️",t:"Maschine starten",d:"Dann Timer per Siri stellen (nächster Schritt)."}
       ];
+    },
+    auf:function(trockner){
+      return trockner
+        ?{ico:"🌀",t:"In den Trockner",d:"Direkt in den Trockner – mittlere Stufe.",hl:"Trockner: mittlere Stufe.",crit:null}
+        :{ico:"💨",t:"Aufhängen",d:"Direkt rausnehmen, aufschütteln, aufhängen.",hl:null,crit:"Nicht liegen lassen! Länger als 30 Min. in der Trommel bedeutet tiefe Falten."};
     }
   },
-  weiss: {
-    titel: "Weiß & Hell", icon: "🤍",
-    contentOptions: [
-      { id: "klamotten", label: "T-Shirts, Hemden, Hosen", icon: "👕", sub: "Lufttrocknen", tag: "luft" },
-      { id: "unterwaesche", label: "Weiße Unterwäsche & Socken", icon: "🧦", sub: "Kann in den Trockner", tag: "trockner" }
+  weiss:{
+    lbl:"Weiß & Hell",ico:"🤍",
+    opts:[
+      {id:"kl",lbl:"T-Shirts, Hemden, Hosen",ico:"👕",sub:"Lufttrocknen",tag:"l"},
+      {id:"uw",lbl:"Weiße Unterwäsche & Socken",ico:"🧦",sub:"Kann in den Trockner",tag:"t"}
     ],
-    sortSteps: function(c) {
-      var s = [];
-      s.push({ icon:"🔍", title:"Nur Helles & Weißes zusammen", desc:"Weiß, Creme, Beige, Hellgrau – alles zusammen okay. Auch helles Altrosa kein Problem wenn es schon öfter gewaschen wurde.", crit:"Ein einziges kräftig-buntes Teil kann die ganze Ladung einfärben!" });
-      s.push({ icon:"📦", title:"Taschen leeren", desc:"Besonders Papiertaschentücher entfernen – die zerfallen und hinterlassen Flusen überall." });
-      if (c.unterwaesche && c.klamotten) s.push({ icon:"📦", title:"Viel Wäsche? Dann aufteilen", desc:"Bei viel Wäsche: Unterwäsche separat waschen. Bei wenig Wäsche alles zusammen.", warn:"Wenig Wäsche? Einfach alles zusammen rein." });
+    sort:function(c){
+      var s=[];
+      s.push({ico:"🔍",t:"Nur Helles & Weißes zusammen",d:"Weiß, Creme, Beige, Hellgrau – alles zusammen okay.",crit:"Ein kräftig-buntes Teil kann die ganze Ladung einfärben!"});
+      s.push({ico:"📦",t:"Taschen leeren",d:"Besonders Papiertaschentücher entfernen – die zerfallen und hinterlassen Flusen überall."});
+      if(c.uw&&c.kl) s.push({ico:"📦",t:"Viel Wäsche? Dann aufteilen",d:"Bei viel Wäsche: Unterwäsche separat. Bei wenig alles zusammen.",warn:"Wenig Wäsche? Einfach alles zusammen rein."});
       return s;
     },
-    getMittel: function() { return "Frosch Sensitiv Aloe Vera"; },
-    getProgramm: function(verfMin) {
-      if (!verfMin) return PROGRAMME.kochbunt;
-      if (verfMin >= PROGRAMME.kochbunt.min + 15) return PROGRAMME.kochbunt;
-      if (verfMin >= PROGRAMME.pflegeleicht.min + 15) return PROGRAMME.pflegeleicht;
-      return PROGRAMME.extrakurz;
-    },
-    machineSteps: function(prog, dos, trockner) {
-      var rpmHint = prog.rpm > 1000 ? " → bitte auf 1000 runterdrehen!" : "";
+    progOrder:['kochbunt','pflegeleicht','extrakurz'],
+    empRpm:1000,
+    steps:function(pk,dos){
+      var pr=PROG[pk]; var rpm=1000;
+      var rpmWarn=pr.rpm>rpm?" Achtung: Maschine auf "+pr.rpm+" voreingestellt → bitte auf "+rpm+" runterdrehen!":"";
       return [
-        { icon:"🔢", title:"Programm einstellen", desc:"Drehe den Regler auf das empfohlene Programm.", hl:"Programm: " + prog.name + " · " + prog.temp + "°C · Schleudern: 1000 U/min" + (prog.rpm > 1000 ? " (Maschine auf " + prog.rpm + " voreingestellt" + rpmHint + ")" : "") },
-        { icon:"🧴", title:"Waschmittel einfüllen", desc:"Frosch Sensitiv Aloe Vera in Fach I – das rechte Fach.", hl:"Menge: " + dos.ml + " ml · ca. " + dos.el + " Esslöffel · Fach I (rechts)" },
-        { icon:"▶️", title:"Maschine starten & Timer setzen", desc:"Starte die Maschine, dann den Timer unten in der iPhone Uhr setzen." },
-        { icon: trockner ? "🌀" : "💨", title: trockner ? "In den Trockner" : "Rausnehmen & aufhängen",
-          desc: trockner ? "Direkt in den Trockner – mittlere Stufe." : "An der Luft trocknen. Sonnenlicht hilft beim Aufhellen.",
-          crit: null }
+        {ico:"🔢",t:"Programm einstellen",d:"Drehe den Regler auf "+pr.n+".",hl:pr.n+" · "+pr.temp+"°C · Schleudern: "+rpm+" U/min"+rpmWarn},
+        {ico:"🧴",t:"Waschmittel einfüllen",d:"Frosch Sensitiv Aloe Vera in Fach I (rechts).",hl:dos.ml+" ml · ca. "+dos.el+" Esslöffel · Fach I"},
+        {ico:"▶️",t:"Maschine starten",d:"Dann Timer per Siri stellen (nächster Schritt)."}
       ];
+    },
+    auf:function(trockner){
+      return trockner
+        ?{ico:"🌀",t:"In den Trockner",d:"Direkt in den Trockner – mittlere Stufe.",hl:"Trockner: mittlere Stufe.",crit:null}
+        :{ico:"💨",t:"Aufhängen",d:"An der Luft trocknen. Sonnenlicht hilft beim Aufhellen.",hl:null,crit:null};
     }
   },
-  sport: {
-    titel: "Sportwäsche", icon: "👟",
-    contentOptions: [
-      { id: "klamotten", label: "Trikots, Shorts, Tops", icon: "👟", sub: "Immer lufttrocknen", tag: "luft" }
-    ],
-    sortSteps: function(c) {
+  sport:{
+    lbl:"Sportwäsche",ico:"👟",
+    opts:[{id:"kl",lbl:"Trikots, Shorts, Tops",ico:"👟",sub:"Immer lufttrocknen",tag:"l"}],
+    sort:function(c){
       return [
-        { icon:"🔍", title:"Taschen leeren & Reißverschlüsse schließen", desc:"Schützt Trommel und andere Textilien." },
-        { icon:"👃", title:"Stark riechende Teile?", desc:"Bei intensivem Geruch direkt nach dem Sport waschen – je länger man wartet, desto schwerer geht der Geruch raus." }
+        {ico:"🔍",t:"Taschen leeren & Reißverschlüsse schließen",d:"Schützt Trommel und andere Textilien."},
+        {ico:"👃",t:"Stark riechende Teile?",d:"Direkt nach dem Sport waschen – je länger man wartet, desto schwerer geht der Geruch raus."}
       ];
     },
-    getMittel: function() { return "Frosch Bunt Granatapfel"; },
-    getProgramm: function(verfMin) {
-      if (!verfMin) return PROGRAMME.sportswear;
-      if (verfMin >= PROGRAMME.sportswear.min + 15) return PROGRAMME.sportswear;
-      return PROGRAMME.extrakurz;
-    },
-    machineSteps: function(prog, dos, trockner) {
+    progOrder:['sportswear','extrakurz'],
+    empRpm:800,
+    steps:function(pk,dos){
       return [
-        { icon:"🔢", title:"Programm einstellen", desc:"Sportswear schont Funktionsfasern optimal.", hl:"Programm: Sportswear · 30°C · Schleudern: 800 U/min" },
-        { icon:"🧴", title:"Waschmittel einfüllen – wenig reicht", desc:"Frosch Bunt Granatapfel in Fach I. Weniger als normal dosieren!", hl:"Menge: " + dos.ml + " ml · ca. " + dos.el + " Esslöffel · Fach I (rechts)", warn:"Zu viel Waschmittel verstopft die Funktionsmembran dauerhaft." },
-        { icon:"▶️", title:"Maschine starten & Timer setzen", desc:"Starte die Maschine, dann den Timer unten in der iPhone Uhr setzen." },
-        { icon:"💨", title:"An der Luft trocknen", desc:"Immer an der Luft trocknen.", crit:"Kein Trockner! Hitze zerstört Funktionsfasern und Elasthan dauerhaft." }
+        {ico:"🔢",t:"Programm einstellen",d:"Sportswear schont Funktionsfasern optimal.",hl:"Sportswear · 30°C · Schleudern: 800 U/min"},
+        {ico:"🧴",t:"Waschmittel einfüllen – wenig reicht",d:"Frosch Bunt Granatapfel in Fach I. Weniger als normal dosieren!",hl:dos.ml+" ml · ca. "+dos.el+" Esslöffel · Fach I",warn:"Zu viel Waschmittel verstopft die Funktionsmembran dauerhaft."},
+        {ico:"▶️",t:"Maschine starten",d:"Dann Timer per Siri stellen (nächster Schritt)."}
       ];
+    },
+    auf:function(trockner){
+      return {ico:"💨",t:"Aufhängen – nicht in den Trockner!",d:"Immer an der Luft trocknen.",hl:null,crit:"Kein Trockner! Hitze zerstört Funktionsfasern und Elasthan dauerhaft."};
     }
   },
-  handtuecher: {
-    titel: "Handtücher", icon: "🛁",
-    contentOptions: [
-      { id: "handtuecher", label: "Handtücher & Badetücher", icon: "🛁", sub: "Danach in den Trockner", tag: "trockner" }
-    ],
-    sortSteps: function(c) {
+  handtuecher:{
+    lbl:"Handtücher",ico:"🛁",
+    opts:[{id:"ht",lbl:"Handtücher & Badetücher",ico:"🛁",sub:"Danach in den Trockner",tag:"t"}],
+    sort:function(c){
       return [
-        { icon:"🔍", title:"Farben prüfen", desc:"Helle und dunkle Handtücher zusammen waschen ist okay – bei 60°C passiert nichts." },
-        { icon:"📦", title:"Locker in den Korb", desc:"Nicht zu fest zusammenknüllen – locker einlegen damit sie gleichmäßig gewaschen werden." }
+        {ico:"🔍",t:"Farben prüfen",d:"Helle und dunkle Handtücher zusammen waschen ist okay – bei 60°C passiert nichts."},
+        {ico:"📦",t:"Locker einlegen",d:"Nicht zusammenknüllen – locker einlegen damit sie gleichmäßig gewaschen werden."}
       ];
     },
-    getMittel: function() { return "Frosch Sensitiv Aloe Vera"; },
-    getProgramm: function(verfMin) {
-      if (!verfMin) return PROGRAMME.kochbunt;
-      if (verfMin >= PROGRAMME.kochbunt.min + 15) return PROGRAMME.kochbunt;
-      if (verfMin >= PROGRAMME.pflegeleicht.min + 15) return PROGRAMME.pflegeleicht;
-      return PROGRAMME.extrakurz;
-    },
-    machineSteps: function(prog, dos, trockner) {
+    progOrder:['kochbunt','pflegeleicht','extrakurz'],
+    empRpm:1200,
+    steps:function(pk,dos){
+      var pr=PROG[pk];
       return [
-        { icon:"🔢", title:"Programm einstellen", desc:"Koch/Bunt bei 60°C – hygienisch und bakterienabtötend.", hl:"Programm: " + prog.name + " · 60°C · Schleudern: 1200 U/min" },
-        { icon:"🧴", title:"Waschmittel einfüllen – kein Weichspüler!", desc:"Frosch Sensitiv Aloe Vera in Fach I (rechts).", hl:"Menge: " + dos.ml + " ml · ca. " + dos.el + " Esslöffel · Fach I (rechts)", crit:"Kein Weichspüler! Macht Handtücher weniger saugfähig. Tipp: 1 TL Natron ins mittlere Fach (☸)." },
-        { icon:"▶️", title:"Maschine starten & Timer setzen", desc:"Starte die Maschine, dann den Timer unten in der iPhone Uhr setzen." },
-        { icon:"🌀", title:"Direkt in den Trockner", desc:"Sofort nach dem Waschen in den Trockner – mittlere Stufe. Macht sie schön flauschig.", hl:"Trockner: mittlere Stufe · Sofort rausnehmen wenn fertig." }
+        {ico:"🔢",t:"Programm einstellen",d:"Koch/Bunt bei 60°C – hygienisch und bakterienabtötend.",hl:pr.n+" · 60°C · Schleudern: 1200 U/min"},
+        {ico:"🧴",t:"Waschmittel einfüllen – kein Weichspüler!",d:"Frosch Sensitiv Aloe Vera in Fach I (rechts).",hl:dos.ml+" ml · ca. "+dos.el+" Esslöffel · Fach I",crit:"Kein Weichspüler! Macht Handtücher weniger saugfähig. Tipp: 1 TL Natron ins mittlere Fach (☸)."},
+        {ico:"▶️",t:"Maschine starten",d:"Dann Timer per Siri stellen (nächster Schritt)."}
       ];
+    },
+    auf:function(trockner){
+      return {ico:"🌀",t:"Direkt in den Trockner",d:"Sofort nach dem Waschen in den Trockner – mittlere Stufe. Macht sie schön flauschig.",hl:"Trockner: mittlere Stufe · Sofort rausnehmen wenn fertig.",crit:null};
     }
   },
-  bettwaesche: {
-    titel: "Bettwäsche", icon: "🛏️",
-    contentOptions: [
-      { id: "bettwaesche", label: "Bezüge, Laken, Kissenbezüge", icon: "🛏️", sub: "Danach in den Trockner", tag: "trockner" }
-    ],
-    sortSteps: function(c) {
+  bettwaesche:{
+    lbl:"Bettwäsche",ico:"🛏️",
+    opts:[{id:"bw",lbl:"Bezüge, Laken, Kissenbezüge",ico:"🛏️",sub:"Danach in den Trockner",tag:"t"}],
+    sort:function(c){
       return [
-        { icon:"🔍", title:"Bezüge aufknoten & auseinanderschütteln", desc:"Bettbezüge aufknoten und locker in den Korb – nicht zusammenknüllen." },
-        { icon:"📦", title:"Maschinenfüllung beachten", desc:"Bettwäsche nimmt viel Platz ein – bei vollen Bezügen lieber nur einen Satz pro Waschgang." }
+        {ico:"🔍",t:"Bezüge aufknoten & auseinanderschütteln",d:"Bettbezüge aufknoten und locker in den Korb – nicht zusammenknüllen."},
+        {ico:"📦",t:"Maschinenfüllung beachten",d:"Bettwäsche nimmt viel Platz ein – bei vollen Bezügen lieber nur einen Satz pro Waschgang."}
       ];
     },
-    getMittel: function() { return "Frosch Sensitiv Aloe Vera"; },
-    getProgramm: function(verfMin) {
-      if (!verfMin) return PROGRAMME.kochbunt;
-      if (verfMin >= PROGRAMME.kochbunt.min + 15) return PROGRAMME.kochbunt;
-      if (verfMin >= PROGRAMME.pflegeleicht.min + 15) return PROGRAMME.pflegeleicht;
-      return PROGRAMME.extrakurz;
-    },
-    machineSteps: function(prog, dos, trockner) {
+    progOrder:['kochbunt','pflegeleicht','extrakurz'],
+    empRpm:1000,
+    steps:function(pk,dos){
+      var pr=PROG[pk];
       return [
-        { icon:"🔢", title:"Programm einstellen", desc:"Koch/Bunt bei 60°C – hygienisch gegen Schweiß und Hautschuppen.", hl:"Programm: " + prog.name + " · 60°C · Schleudern: 1000 U/min" },
-        { icon:"🧴", title:"Waschmittel einfüllen", desc:"Frosch Sensitiv Aloe Vera in Fach I (rechts). Sanft zur Haut.", hl:"Menge: " + dos.ml + " ml · ca. " + dos.el + " Esslöffel · Fach I (rechts)" },
-        { icon:"▶️", title:"Maschine starten & Timer setzen", desc:"Starte die Maschine, dann den Timer unten in der iPhone Uhr setzen." },
-        { icon:"🌀", title:"Rausnehmen, aufschütteln, Trockner", desc:"Jeden Bezug kurz aufschütteln, dann in den Trockner bei mittlerer Stufe.", hl:"Trockner: mittlere Stufe · Sofort rausnehmen wenn fertig." }
+        {ico:"🔢",t:"Programm einstellen",d:"Koch/Bunt bei 60°C – hygienisch gegen Schweiß und Hautschuppen.",hl:pr.n+" · 60°C · Schleudern: 1000 U/min"},
+        {ico:"🧴",t:"Waschmittel einfüllen",d:"Frosch Sensitiv Aloe Vera in Fach I (rechts). Sanft zur Haut.",hl:dos.ml+" ml · ca. "+dos.el+" Esslöffel · Fach I"},
+        {ico:"▶️",t:"Maschine starten",d:"Dann Timer per Siri stellen (nächster Schritt)."}
       ];
+    },
+    auf:function(trockner){
+      return {ico:"🌀",t:"Rausnehmen, aufschütteln, Trockner",d:"Jeden Bezug kurz aufschütteln, dann in den Trockner bei mittlerer Stufe.",hl:"Trockner: mittlere Stufe · Sofort rausnehmen wenn fertig.",crit:null};
     }
   }
 };
 
-function setPips(phase) {
-  for (var i = 1; i <= 2; i++) document.getElementById('pip-' + i).classList.toggle('active', i <= phase);
-}
+// ── LocalStorage ───────────────────────────────────────────────
+function saveAW(type,name,fertig){try{localStorage.setItem('aw',JSON.stringify({type:type,name:name,fertig:fertig}));}catch(e){}}
+function loadAW(){try{return JSON.parse(localStorage.getItem('aw'));}catch(e){return null;}}
+function clearAW(){try{localStorage.removeItem('aw');}catch(e){}}
 
-function selectType(btn) {
-  document.querySelectorAll('.type-btn').forEach(function(b) { b.classList.remove('selected'); });
-  btn.classList.add('selected');
-  selectedType = btn.dataset.type;
-  selectedContent = {};
-  renderContentOptions();
-}
-
-function renderContentOptions() {
-  var p = PROFILES[selectedType];
-  var grid = document.getElementById('content-grid');
-  var card = document.getElementById('card-content');
-  grid.innerHTML = '';
-  if (p.contentOptions.length === 0) { card.style.display = 'none'; renderSortSteps(); return; }
-  card.style.display = 'block';
-  p.contentOptions.forEach(function(opt) {
-    var tagHtml = opt.tag ? '<span class="ci-tag ' + opt.tag + '">' + (opt.tag === 'trockner' ? 'kann in den Trockner' : 'Lufttrocknen') + '</span>' : '';
-    var div = document.createElement('div');
-    div.className = 'content-item';
-    div.dataset.id = opt.id;
-    div.innerHTML = '<span class="ci-icon">' + opt.icon + '</span><div class="ci-text"><div class="ci-label">' + opt.label + '</div><div class="ci-sub">' + opt.sub + '</div></div>' + tagHtml;
-    div.onclick = function() { toggleContent(this); };
-    grid.appendChild(div);
-  });
-  document.getElementById('sort-steps').style.display = 'none';
-}
-
-function toggleContent(el) {
-  selectedContent[el.dataset.id] = !selectedContent[el.dataset.id];
-  el.classList.toggle('selected', selectedContent[el.dataset.id]);
-  renderSortSteps();
-}
-
-function renderSortSteps() {
-  var p = PROFILES[selectedType];
-  var hasContent = p.contentOptions.length === 0 || Object.values(selectedContent).some(function(v) { return v; });
-  if (!hasContent) { document.getElementById('sort-steps').style.display = 'none'; return; }
-  var steps = p.sortSteps(selectedContent);
-  var list = document.getElementById('sort-steps-list');
-  list.innerHTML = '';
-  sortStepsChecked = new Array(steps.length).fill(false);
-  steps.forEach(function(s, i) {
-    var extra = '';
-    if (s.hl) extra += '<div class="step-hl">' + s.hl + '</div>';
-    if (s.warn) extra += '<div class="step-warn">⚠️ ' + s.warn + '</div>';
-    if (s.crit) extra += '<div class="step-crit"><span>❗</span><span>' + s.crit + '</span></div>';
-    list.innerHTML += '<div class="step" id="sort-' + i + '" onclick="toggleSortStep(' + i + ')">' +
-      '<div class="step-check" id="sort-check-' + i + '"></div>' +
-      '<div class="step-content"><span class="step-icon">' + s.icon + '</span>' +
-      '<div class="step-title">' + s.title + '</div><div class="step-desc">' + s.desc + '</div>' + extra + '</div></div>';
-  });
-  document.getElementById('sort-steps').style.display = 'block';
-  checkSortReady();
-}
-
-function toggleSortStep(i) {
-  sortStepsChecked[i] = !sortStepsChecked[i];
-  document.getElementById('sort-' + i).classList.toggle('done', sortStepsChecked[i]);
-  document.getElementById('sort-check-' + i).textContent = sortStepsChecked[i] ? '✓' : '';
-  checkSortReady();
-}
-
-function checkSortReady() {
-  var allDone = sortStepsChecked.length > 0 && sortStepsChecked.every(function(v) { return v; });
-  var btn = document.getElementById('btn-runter');
-  btn.disabled = !allDone;
-  document.getElementById('sort-hint').style.display = allDone ? 'none' : 'block';
-}
-
-function goPhase2() {
-  document.getElementById('screen-phase1').classList.remove('active');
-  document.getElementById('screen-phase2').classList.add('active');
-  setPips(2); window.scrollTo(0, 0);
-}
-
-function backToPhase1() {
-  document.getElementById('screen-phase2').classList.remove('active');
-  document.getElementById('screen-phase1').classList.add('active');
-  setPips(1); window.scrollTo(0, 0);
-}
-
-function selectFill(btn) {
-  document.querySelectorAll('.fill-btn').forEach(function(b) { b.classList.remove('selected'); });
-  btn.classList.add('selected');
-  selectedFill = parseFloat(btn.dataset.fill);
-  checkPhase2Ready();
-}
-
-function selectScenario(btn) {
-  document.querySelectorAll('.scenario-btn').forEach(function(b) { b.classList.remove('selected'); });
-  btn.classList.add('selected');
-  selectedScenario = btn.dataset.scenario;
-  drumH = null; drumM = null; zeitMinuten = null;
-  document.getElementById('display-h').textContent = 'HH';
-  document.getElementById('display-m').textContent = 'MM';
-  document.getElementById('flow-hint').className = 'flow-hint';
-
-  var flow = document.getElementById('unterwegs-flow');
-  var q = document.getElementById('flow-question');
-
-  if (selectedScenario === 'flexibel') {
-    flow.className = 'unterwegs-flow';
-    zeitMinuten = null;
-  } else if (selectedScenario === 'unterwegs') {
-    flow.className = 'unterwegs-flow visible';
-    q.textContent = 'Wann musst du los?';
-  } else if (selectedScenario === 'dringend') {
-    flow.className = 'unterwegs-flow visible';
-    q.textContent = 'Wann musst du spätestens los?';
+function checkBanner(){
+  var a=loadAW(); var el=document.getElementById('abanner');
+  if(!a){el.style.display='none';return;}
+  var now=new Date(); var ft=new Date(a.fertig);
+  var pr=PROF[a.type];
+  if(ft>now){
+    var diff=Math.round((ft-now)/60000);
+    var h=Math.floor(diff/60),m=diff%60;
+    document.getElementById('ab-h').textContent=(pr?pr.ico:'🧺')+' '+(pr?pr.lbl:a.type)+' läuft';
+    document.getElementById('ab-p').textContent=a.name+' – noch ca. '+(h>0?h+' Std. ':'')+m+' Min. – fertig um '+p2(ft.getHours())+':'+p2(ft.getMinutes())+' Uhr';
+  } else {
+    document.getElementById('ab-h').textContent='🧺 Wäsche ist fertig!';
+    document.getElementById('ab-p').textContent=(pr?pr.lbl:a.type)+' – jetzt rausnehmen!';
   }
-  checkPhase2Ready();
+  el.style.display='block';
+}
+function abDone(){clearAW();document.getElementById('abanner').style.display='none';}
+
+// ── Navigation ─────────────────────────────────────────────────
+function setPips(n){for(var i=1;i<=4;i++){var el=document.getElementById('p'+i);if(el)el.classList.toggle('on',i<=n);}}
+function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on');});document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
+
+// ── S1 ─────────────────────────────────────────────────────────
+function pickType(btn){
+  document.querySelectorAll('.tbtn').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on'); T=btn.dataset.t; C={};
+  renderOpts();
+  if(F) initDialog();
 }
 
-function changeHour(dir) {
-  if (drumH === null) drumH = new Date().getHours();
-  drumH = (drumH - dir + 24) % 24;
-  document.getElementById('display-h').textContent = pad2(drumH);
-  updateZeitLogik();
+function renderOpts(){
+  var pr=PROF[T]; var grid=document.getElementById('content-grid'); var card=document.getElementById('c-content');
+  grid.innerHTML='';
+  if(!pr.opts.length){card.style.display='none';renderSort();return;}
+  card.style.display='block';
+  pr.opts.forEach(function(o){
+    var tag=o.tag?'<span class="ctag '+o.tag+'">'+(o.tag==='t'?'kann in den Trockner':'Lufttrocknen')+'</span>':'';
+    var d=document.createElement('div');
+    d.className='citem';d.dataset.id=o.id;
+    d.innerHTML='<span class="cico">'+o.ico+'</span><div class="ctxt"><div class="clbl">'+o.lbl+'</div><div class="csub">'+o.sub+'</div></div>'+tag;
+    d.onclick=function(){toggleC(this);};
+    grid.appendChild(d);
+  });
+  document.getElementById('sort-area').style.display='none';
 }
 
-function changeMinute(dir) {
-  if (drumM === null) drumM = 0;
-  drumM = (drumM - dir * 10 + 60) % 60;
-  document.getElementById('display-m').textContent = pad2(drumM);
-  updateZeitLogik();
+function toggleC(el){
+  C[el.dataset.id]=!C[el.dataset.id];
+  el.classList.toggle('on',C[el.dataset.id]);
+  renderSort();
 }
 
-function updateZeitLogik() {
-  if (drumH === null || drumM === null) { checkPhase2Ready(); return; }
-  var now = new Date();
-  var ziel = new Date(); ziel.setHours(drumH, drumM, 0, 0);
-  if (ziel <= now) ziel.setDate(ziel.getDate() + 1);
-  var diffMin = Math.round((ziel - now) / 60000);
-  var hint = document.getElementById('flow-hint');
+function renderSort(){
+  var pr=PROF[T];
+  var any=!pr.opts.length||Object.values(C).some(function(v){return v;});
+  if(!any){document.getElementById('sort-area').style.display='none';return;}
+  var steps=pr.sort(C);
+  var list=document.getElementById('sort-list');
+  list.innerHTML='';
+  sortChk=new Array(steps.length).fill(false);
+  steps.forEach(function(s,i){
+    var ex='';
+    if(s.hl) ex+='<div class="shl">'+s.hl+'</div>';
+    if(s.warn) ex+='<div class="swarn">⚠️ '+s.warn+'</div>';
+    if(s.crit) ex+='<div class="scrit"><span>❗</span><span>'+s.crit+'</span></div>';
+    list.innerHTML+='<div class="step" id="ss'+i+'" onclick="toggleSort('+i+')"><div class="chk" id="sc'+i+'"></div><div class="scnt"><span class="sico">'+s.ico+'</span><div class="stitle">'+s.t+'</div><div class="sdesc">'+s.d+'</div>'+ex+'</div></div>';
+  });
+  document.getElementById('sort-area').style.display='block';
+  checkSort();
+}
 
-  if (selectedScenario === 'dringend') {
-    // Dringend: Zeit bis los minus 15 Min Puffer
-    var verfMin = diffMin - 15;
-    var p = PROFILES[selectedType];
-    var prog = p.getProgramm(verfMin);
-    if (verfMin < PROGRAMME.extrakurz.min) {
-      hint.className = 'flow-hint visible';
-      hint.textContent = 'Zu wenig Zeit – lieber die Wäsche später machen wenn du zurück bist.';
-      zeitMinuten = -1;
-    } else {
-      hint.className = 'flow-hint visible';
-      hint.style.background = 'var(--accent-light)';
-      hint.style.color = 'var(--accent)';
-      hint.textContent = 'Passt! Empfehlung: ' + prog.name + ' (' + prog.min + ' Min.) – du bist rechtzeitig fertig.';
-      zeitMinuten = verfMin;
-    }
-  } else if (selectedScenario === 'unterwegs') {
-    // Unterwegs: wann musst du los -> genug Zeit?
-    var p2 = PROFILES[selectedType];
-    var kurzProg = p2.getProgramm(999);
-    var verfMin2 = diffMin - 15;
-    if (verfMin2 < PROGRAMME.extrakurz.min) {
-      hint.className = 'flow-hint visible';
-      hint.textContent = 'Zu wenig Zeit vor dem Losfahren. Wann kommst du zurück? Nutze die Zeitvorwahl.';
-      zeitMinuten = diffMin; // use for zeitvorwahl calculation
-    } else {
-      hint.className = 'flow-hint visible';
-      hint.style.background = 'var(--accent-light)';
-      hint.style.color = 'var(--accent)';
-      var bestProg = p2.getProgramm(verfMin2);
-      hint.textContent = 'Noch ' + diffMin + ' Min. bis du losmusst. Empfehlung: ' + bestProg.name + ' (' + bestProg.min + ' Min.) – fertig bevor du gehst.';
-      zeitMinuten = verfMin2;
-    }
+function toggleSort(i){
+  sortChk[i]=!sortChk[i];
+  document.getElementById('ss'+i).classList.toggle('done',sortChk[i]);
+  document.getElementById('sc'+i).textContent=sortChk[i]?'✓':'';
+  checkSort();
+}
+function checkSort(){
+  var ok=sortChk.length>0&&sortChk.every(function(v){return v;});
+  document.getElementById('btn-down').disabled=!ok;
+  document.getElementById('sort-hint').style.display=ok?'none':'block';
+}
+function goS2(){showScreen('s2');setPips(2);}
+function goS1Back(){showScreen('s1');setPips(1);}
+
+// ── S2 ─────────────────────────────────────────────────────────
+function pickFill(btn){
+  document.querySelectorAll('.fbtn').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on'); F=parseFloat(btn.dataset.f);
+  if(T) initDialog();
+  checkAnl();
+}
+
+function initDialog(){
+  var pr=PROF[T];
+  progOrder=pr.progOrder; progIdx=0;
+  dh=null;dm=null;zMin=null;dlgState=null;
+  document.getElementById('dH').textContent='HH';
+  document.getElementById('dM').textContent='MM';
+  document.getElementById('rueck-hint').className='hint';
+  document.getElementById('d-rueck').style.display='none';
+  document.getElementById('d-back-confirmed').style.display='none';
+  showDialogStep();
+}
+
+function showDialogStep(){
+  document.getElementById('dialog-card').style.display='block';
+  var pk=progOrder[progIdx];
+  var pr=PROG[pk];
+  var now=new Date();
+  var ft=new Date(now.getTime()+pr.min*60000);
+  var ftStr=p2(ft.getHours())+':'+p2(ft.getMinutes())+' Uhr';
+
+  document.getElementById('d-prog').style.display='block';
+  document.getElementById('d-prog-txt').textContent=pr.n+' – fertig um ca. '+ftStr+' ('+pr.min+' Min.)';
+  document.getElementById('d-q').textContent='Bist du um '+ftStr+' zu Hause?';
+  document.getElementById('d-rueck').style.display='none';
+  document.getElementById('d-back-confirmed').style.display='none';
+
+  var btns=document.getElementById('d-btns');
+  btns.style.display='block';
+  btns.innerHTML='';
+  var opts=[
+    {v:'ja',ico:'✅',t:'Ja, ich bin zu Hause'},
+    {v:'weg',ico:'🚗',t:'Nein, ich bin unterwegs'},
+  ];
+  if(progIdx<progOrder.length-1) opts.push({v:'schnell',ico:'⚡',t:'Nein, ich brauche es schneller'});
+  opts.forEach(function(o){
+    var b=document.createElement('button');
+    b.className='dbtn';
+    b.innerHTML='<span class="dico">'+o.ico+'</span><div><div class="dtitle">'+o.t+'</div></div>';
+    b.onclick=function(){dlgAns(o.v);};
+    btns.appendChild(b);
+  });
+  dlgState='q';
+  scenario='flexibel';
+  zMin=null;
+  checkAnl();
+}
+
+function dlgAns(v){
+  if(v==='ja'){
+    scenario='flexibel';zMin=null;
+    document.getElementById('d-btns').style.display='none';
+    document.getElementById('d-rueck').style.display='none';
+    document.getElementById('d-q').textContent='✅ Super – bestes Programm ausgewählt!';
+    document.getElementById('d-back-confirmed').style.display='block';
+    dlgState='ok';
+    checkAnl();
+  } else if(v==='weg'){
+    scenario='weg';
+    document.getElementById('d-btns').style.display='none';
+    document.getElementById('d-rueck').style.display='block';
+    document.getElementById('d-q').textContent='Wann bist du zurück?';
+    document.getElementById('d-back-confirmed').style.display='none';
+    dh=null;dm=null;
+    document.getElementById('dH').textContent='HH';
+    document.getElementById('dM').textContent='MM';
+    document.getElementById('rueck-hint').className='hint';
+    dlgState='rueck';
+    checkAnl();
+  } else if(v==='schnell'){
+    progIdx++;
+    if(progIdx>=progOrder.length) progIdx=progOrder.length-1;
+    showDialogStep();
   }
-  checkPhase2Ready();
 }
 
-function checkPhase2Ready() {
-  var ok = false;
-  if (selectedFill && selectedScenario === 'flexibel') ok = true;
-  if (selectedFill && (selectedScenario === 'unterwegs' || selectedScenario === 'dringend') && drumH !== null && drumM !== null && zeitMinuten !== -1) ok = true;
-  document.getElementById('btn-anleitung').disabled = !ok;
+function dialogBack(){
+  dh=null;dm=null;zMin=null;
+  document.getElementById('dH').textContent='HH';
+  document.getElementById('dM').textContent='MM';
+  document.getElementById('rueck-hint').className='hint';
+  showDialogStep();
 }
 
-function getDosierung(type, fill) {
-  var base = { schwarz:60, bunt:65, weiss:60, sport:40, handtuecher:65, bettwaesche:60 };
-  var ml = Math.round(base[type] * fill);
-  return { ml: ml, el: Math.round(ml / 15) };
+function dH(dir){
+  if(dh===null) dh=new Date().getHours();
+  dh=(dh-dir+24)%24;
+  document.getElementById('dH').textContent=p2(dh);
+  calcRueck();
+}
+function dM(dir){
+  if(dm===null) dm=0;
+  dm=(dm-dir*10+60)%60;
+  document.getElementById('dM').textContent=p2(dm);
+  calcRueck();
 }
 
-function hasTrockner() {
-  return !!(selectedContent['unterwaesche'] || selectedContent['handtuecher'] || selectedContent['bettwaesche']);
+function calcRueck(){
+  if(dh===null||dm===null){checkAnl();return;}
+  var pk=progOrder[progIdx]; var pr=PROG[pk];
+  var now=new Date(); var rueck=new Date();
+  rueck.setHours(dh,dm,0,0);
+  if(rueck<=now) rueck.setDate(rueck.getDate()+1);
+  var rMin=Math.round((rueck-now)/60000);
+  var warte=rMin-pr.min-10;
+  var wStd=Math.max(0,Math.floor(warte/60));
+  var hint=document.getElementById('rueck-hint');
+  hint.className='hint on';
+  if(warte<0){
+    hint.className='hint on w';
+    hint.textContent='Wäsche ist fertig bevor du zurückkommst – sofort starten, keine Zeitvorwahl nötig.';
+    zMin=null;scenario='flexibel';
+  } else if(wStd<1){
+    hint.className='hint on g';
+    hint.textContent='Fast keine Verzögerung nötig – jetzt starten, Wäsche ist kurz nach deiner Rückkehr fertig.';
+    zMin=null;scenario='flexibel';
+  } else {
+    hint.className='hint on g';
+    hint.textContent='Stelle '+wStd+' Stunde'+(wStd>1?'n':'')+' Zeitvorwahl an der Bosch ein – Wäsche fertig kurz nach deiner Rückkehr.';
+    zMin=rMin;scenario='weg';
+  }
+  checkAnl();
 }
 
-function showAnleitung() {
-  var p = PROFILES[selectedType];
-  var dos = getDosierung(selectedType, selectedFill);
-  var verfMin = selectedScenario === 'flexibel' ? null : zeitMinuten;
-  var prog = p.getProgramm(verfMin);
-  var trockner = hasTrockner();
-  currentProgMin = prog.min;
+function checkAnl(){
+  var ok=false;
+  if(F&&T&&dlgState==='ok') ok=true;
+  if(F&&T&&dlgState==='rueck'&&dh!==null&&dm!==null) ok=true;
+  document.getElementById('btn-anl').disabled=!ok;
+}
 
-  document.getElementById('anl-titel').textContent = p.icon + ' ' + p.titel;
-  document.getElementById('anl-sub').textContent = prog.name + ' · ca. ' + prog.min + ' Min. · ' + prog.temp + '°C';
+// ── S3 ─────────────────────────────────────────────────────────
+function getDos(type,fill){
+  var b={schwarz:60,bunt:65,weiss:60,sport:40,handtuecher:65,bettwaesche:60};
+  var ml=Math.round(b[type]*fill);
+  return {ml:ml,el:Math.round(ml/15)};
+}
+function hasTr(){return !!(C.uw||C.ht||C.bw);}
 
-  // Zeitvorwahl nur bei "unterwegs" wenn Zeit übrig
-  var zvCard = document.getElementById('zv-card');
-  if (selectedScenario === 'unterwegs' && zeitMinuten && zeitMinuten > prog.min + 30) {
-    var warteRaw = zeitMinuten - prog.min;
-    var warteStd = Math.floor(warteRaw / 60);
-    if (warteStd >= 1) {
-      document.getElementById('zv-hl').textContent = 'Zeitvorwahl: ' + warteStd + ' Stunde' + (warteStd > 1 ? 'n' : '') + ' verzögert starten';
-      document.getElementById('zv-text').textContent = 'Stelle ' + warteStd + ' Stunde' + (warteStd > 1 ? 'n' : '') + ' Verzögerung an der Maschine ein – die Wäsche ist dann fertig wenn du zurückkommst. Hinweis: Die Bosch stellt nur in vollen Stunden ein.';
-      zvCard.style.display = 'block';
-    } else { zvCard.style.display = 'none'; }
-  } else { zvCard.style.display = 'none'; }
+function goS3(){
+  var pr=PROF[T];
+  var dos=getDos(T,F);
+  var pk=progOrder[Math.min(progIdx,progOrder.length-1)];
+  var pObj=PROG[pk];
+  curMin=pObj.min; curName=pObj.n; curTrockner=hasTr();
 
-  // Timer display
-  var th = Math.floor(prog.min / 60);
-  var tm = prog.min % 60;
-  document.getElementById('timer-display').textContent = pad2(th) + ':' + pad2(tm) + ':00';
+  document.getElementById('anl-h').textContent=pr.ico+' '+pr.lbl;
+  document.getElementById('anl-p').textContent=pObj.n+' · ca. '+pObj.min+' Min. · '+pObj.temp+'°C';
+
+  // ZV
+  var zvc=document.getElementById('zvc');
+  if(scenario==='weg'&&zMin&&zMin>pObj.min+30){
+    var ws=Math.floor((zMin-pObj.min)/60);
+    if(ws>=1){
+      document.getElementById('zv-hl').textContent='Zeitvorwahl: '+ws+' Stunde'+(ws>1?'n':'')+' verzögert starten';
+      document.getElementById('zv-p').textContent='Stelle '+ws+' Stunde'+(ws>1?'n':'')+' Verzögerung an der Bosch ein. Hinweis: Die Bosch stellt nur in vollen Stunden ein.';
+      zvc.style.display='block';
+    } else {zvc.style.display='none';}
+  } else {zvc.style.display='none';}
 
   // Steps
-  var steps = p.machineSteps(prog, dos, trockner);
-  var container = document.getElementById('maschinen-steps');
-  container.innerHTML = '';
-  machStepsChecked = new Array(steps.length).fill(false);
-  steps.forEach(function(s, i) {
-    var extra = '';
-    if (s.hl) extra += '<div class="step-hl">' + s.hl + '</div>';
-    if (s.warn) extra += '<div class="step-warn">⚠️ ' + s.warn + '</div>';
-    if (s.crit) extra += '<div class="step-crit"><span>❗</span><span>' + s.crit + '</span></div>';
-    container.innerHTML += '<div class="step" id="mach-' + i + '" onclick="toggleMachStep(' + i + ')">' +
-      '<div class="step-check" id="mach-check-' + i + '"></div>' +
-      '<div class="step-content"><span class="step-icon">' + s.icon + '</span>' +
-      '<div class="step-title">' + s.title + '</div><div class="step-desc">' + s.desc + '</div>' + extra + '</div></div>';
+  var steps=pr.steps(pk,dos);
+  var cont=document.getElementById('mach-steps');
+  cont.innerHTML='';
+  machChk=new Array(steps.length).fill(false);
+  steps.forEach(function(s,i){
+    var ex='';
+    if(s.hl) ex+='<div class="shl">'+s.hl+'</div>';
+    if(s.warn) ex+='<div class="swarn">⚠️ '+s.warn+'</div>';
+    if(s.crit) ex+='<div class="scrit"><span>❗</span><span>'+s.crit+'</span></div>';
+    cont.innerHTML+='<div class="step" id="ms'+i+'" onclick="toggleMach('+i+')"><div class="chk" id="mc'+i+'"></div><div class="scnt"><span class="sico">'+s.ico+'</span><div class="stitle">'+s.t+'</div><div class="sdesc">'+s.d+'</div>'+ex+'</div></div>';
   });
-
-  updateMachProgress();
-  document.getElementById('screen-phase2').classList.remove('active');
-  document.getElementById('screen-anleitung').classList.add('active');
-  window.scrollTo(0, 0);
+  document.getElementById('anl-prog').style.width='0%';
+  showScreen('s3');setPips(3);
 }
 
-function toggleMachStep(i) {
-  machStepsChecked[i] = !machStepsChecked[i];
-  document.getElementById('mach-' + i).classList.toggle('done', machStepsChecked[i]);
-  document.getElementById('mach-check-' + i).textContent = machStepsChecked[i] ? '✓' : '';
-  updateMachProgress();
+function toggleMach(i){
+  machChk[i]=!machChk[i];
+  document.getElementById('ms'+i).classList.toggle('done',machChk[i]);
+  document.getElementById('mc'+i).textContent=machChk[i]?'✓':'';
+  var done=machChk.filter(Boolean).length;
+  document.getElementById('anl-prog').style.width=(done/machChk.length*100)+'%';
 }
 
-function updateMachProgress() {
-  var done = machStepsChecked.filter(Boolean).length;
-  document.getElementById('progress-bar').style.width = (machStepsChecked.length ? done / machStepsChecked.length * 100 : 0) + '%';
+function goS2Back(){showScreen('s2');setPips(2);}
+
+// ── S4 ─────────────────────────────────────────────────────────
+function maschineLaeuft(){
+  var pr=PROF[T];
+  var ft=new Date(Date.now()+curMin*60000);
+  var ftStr=p2(ft.getHours())+':'+p2(ft.getMinutes())+' Uhr';
+
+  document.getElementById('s4-h').textContent=pr.ico+' '+pr.lbl+' läuft';
+  document.getElementById('s4-p').textContent=curName+' – fertig um ca. '+ftStr;
+
+  // Siri text
+  var h=Math.floor(curMin/60),m=curMin%60;
+  var zs=h>0&&m>0?(h+' Stunde'+(h>1?'n':'')+' und '+m+' Minuten'):h>0?(h+' Stunde'+(h>1?'n':'')):m+' Minuten';
+  document.getElementById('siri-txt').textContent='Hey Siri, stelle einen Timer auf '+zs+' mit dem Namen Wäsche aufhängen';
+
+  saveAW(T,curName,ft.toISOString());
+  showScreen('s4');setPips(4);
 }
 
-function openUhrApp() {
-  var totalSec = currentProgMin * 60;
-  // iOS Clock app deep link
-  var url = 'clock-alarm://';
-  // Use x-callback for timer if available, otherwise use clock:// 
-  // Best approach: generate a reminder link with the time
-  var minutes = currentProgMin;
-  // Open clock app - iOS supports clock-alarm:// and clock://
-  window.location.href = 'clock-timer://?seconds=' + totalSec;
-  setTimeout(function() {
-    // Fallback: show instructions
-    alert('Timer stellen:\n\n1. Uhr-App öffnen\n2. Timer auswählen\n3. ' + Math.floor(minutes/60) + ' Std. ' + (minutes%60) + ' Min. einstellen\n4. Titel: "Wäsche aufhängen"');
-  }, 1500);
+function copySiri(){
+  var txt=document.getElementById('siri-txt').textContent;
+  var hint=document.getElementById('siri-copy-hint');
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(txt).then(function(){hint.textContent='✓ Kopiert!';setTimeout(function(){hint.textContent='Antippen zum Kopieren';},2000);});
+  } else {
+    var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    hint.textContent='✓ Kopiert!';setTimeout(function(){hint.textContent='Antippen zum Kopieren';},2000);
+  }
 }
 
-function resetTimerDisplay() {
-  var th = Math.floor(currentProgMin / 60);
-  var tm = currentProgMin % 60;
-  document.getElementById('timer-display').textContent = pad2(th) + ':' + pad2(tm) + ':00';
-  document.getElementById('timer-reset-btn').style.display = 'none';
+// ── S5 ─────────────────────────────────────────────────────────
+function goS5(){
+  var pr=PROF[T];
+  var auf=pr.auf(curTrockner);
+
+  document.getElementById('s5-p').textContent=pr.lbl+' – jetzt rausnehmen und '+auf.t.toLowerCase()+'.';
+
+  // Aufhängen step
+  document.getElementById('auf-ico').textContent=auf.ico;
+  document.getElementById('auf-title').textContent=auf.t;
+  document.getElementById('auf-desc').textContent=auf.d;
+  if(auf.hl){document.getElementById('auf-hl').textContent=auf.hl;document.getElementById('auf-hl').style.display='block';}
+  else document.getElementById('auf-hl').style.display='none';
+  if(auf.crit){document.getElementById('auf-crit-txt').textContent=auf.crit;document.getElementById('auf-crit').style.display='flex';}
+  else document.getElementById('auf-crit').style.display='none';
+
+  // Reset checks
+  document.getElementById('step-raus').classList.remove('done');
+  document.getElementById('chk-raus').textContent='';
+  document.getElementById('step-auf').classList.remove('done');
+  document.getElementById('chk-auf').textContent='';
+
+  clearAW();
+  showScreen('s5');setPips(4);
 }
 
-function backToPhase2() {
-  document.getElementById('screen-anleitung').classList.remove('active');
-  document.getElementById('screen-phase2').classList.add('active');
-  window.scrollTo(0, 0);
+function toggleStep(stepId,chkId){
+  var s=document.getElementById(stepId);
+  var c=document.getElementById(chkId);
+  var done=c.textContent==='✓';
+  s.classList.toggle('done',!done);
+  c.textContent=done?'':'✓';
 }
 
-function startOver() {
-  selectedType = null; selectedFill = null; selectedContent = {};
-  selectedScenario = null; drumH = null; drumM = null; zeitMinuten = null;
-  document.getElementById('display-h').textContent = 'HH';
-  document.getElementById('display-m').textContent = 'MM';
-  document.getElementById('unterwegs-flow').className = 'unterwegs-flow';
-  document.getElementById('flow-hint').className = 'flow-hint';
-  document.querySelectorAll('.type-btn,.fill-btn,.content-item,.scenario-btn').forEach(function(b) { b.classList.remove('selected'); });
-  document.getElementById('card-content').style.display = 'none';
-  document.getElementById('sort-steps').style.display = 'none';
-  document.getElementById('screen-anleitung').classList.remove('active');
-  document.getElementById('screen-phase2').classList.remove('active');
-  document.getElementById('screen-phase1').classList.add('active');
-  setPips(1); window.scrollTo(0, 0);
+function toggleStepAuf(){
+  toggleStep('step-auf','chk-auf');
 }
 
+// ── Reset ──────────────────────────────────────────────────────
+function startOver(){
+  T=null;F=null;C={};scenario=null;dh=null;dm=null;zMin=null;
+  progOrder=[];progIdx=0;dlgState=null;
+  curMin=0;curName='';curTrockner=false;
+  document.querySelectorAll('.tbtn,.fbtn,.citem').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('c-content').style.display='none';
+  document.getElementById('sort-area').style.display='none';
+  document.getElementById('dialog-card').style.display='none';
+  document.getElementById('btn-anl').disabled=true;
+  checkBanner();
+  showScreen('s1');setPips(1);
+}
+
+// ── Init ───────────────────────────────────────────────────────
 setPips(1);
+checkBanner();
 </script>
 </body>
 </html>
